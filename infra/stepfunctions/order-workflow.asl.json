@@ -1,0 +1,54 @@
+{
+  "Comment": "Order Processing Workflow PoC",
+  "StartAt": "OrderReceive",
+  "States": {
+    "OrderReceive": {
+      "Type": "Task",
+      "Resource": "${ORDER_RECEIVE_LAMBDA_ARN}",
+      "Next": "InventoryCheck"
+    },
+
+    "InventoryCheck": {
+      "Type": "Task",
+      "Resource": "${INVENTORY_LAMBDA_ARN}",
+      "Next": "Payment"
+    },
+
+    "Payment": {
+      "Type": "Task",
+      "Resource": "${PAYMENT_LAMBDA_ARN}",
+      "Retry": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "IntervalSeconds": 3,
+          "MaxAttempts": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "NotifyFail"
+        }
+      ],
+      "Next": "Shipping"
+    },
+
+    "Shipping": {
+      "Type": "Task",
+      "Resource": "${SHIPPING_LAMBDA_ARN}",
+      "Next": "NotifySuccess"
+    },
+
+    "NotifySuccess": {
+      "Type": "Task",
+      "Resource": "${NOTIFY_LAMBDA_ARN}",
+      "End": true
+    },
+
+    "NotifyFail": {
+      "Type": "Task",
+      "Resource": "${NOTIFY_LAMBDA_ARN}",
+      "End": true
+    }
+  }
+}
