@@ -1,0 +1,6 @@
+roleName: OrderLambdaRole
+assumeRolePolicy:
+  service: lambda.amazonaws.com
+
+managedPolicies:
+  - AWSLambdaBasicExecutionRole

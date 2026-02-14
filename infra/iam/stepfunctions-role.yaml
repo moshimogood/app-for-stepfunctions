@@ -1,0 +1,7 @@
+roleName: OrderStepFunctionsRole
+assumeRolePolicy:
+  service: states.amazonaws.com
+
+managedPolicies:
+  - AWSStepFunctionsFullAccess
+  - AWSLambdaRole
