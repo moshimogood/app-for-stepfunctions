@@ -11,6 +11,46 @@
     "InventoryCheck": {
       "Type": "Task",
       "Resource": "${INVENTORY_LAMBDA_ARN}",
+      "Next": "InventoryChoice"
+    },
+
+    "InventoryChoice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.status",
+          "StringEquals": "OUT_OF_STOCK",
+          "Next": "NotifyOutOfStock"
+        }
+      ],
+      "Default": "PreCheck"
+    },
+
+    "PreCheck": {
+      "Type": "Parallel",
+      "ResultPath": null,
+      "Branches": [
+        {
+          "StartAt": "FraudCheck",
+          "States": {
+            "FraudCheck": {
+              "Type": "Task",
+              "Resource": "${FRAUD_CHECK_LAMBDA_ARN}",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "PointCalculate",
+          "States": {
+            "PointCalculate": {
+              "Type": "Task",
+              "Resource": "${POINT_CALCULATE_LAMBDA_ARN}",
+              "End": true
+            }
+          }
+        }
+      ],
       "Next": "Payment"
     },
 
@@ -27,10 +67,16 @@
       "Catch": [
         {
           "ErrorEquals": ["States.ALL"],
-          "Next": "NotifyFail"
+          "Next": "CancelOrder"
         }
       ],
       "Next": "Shipping"
+    },
+
+    "CancelOrder": {
+      "Type": "Task",
+      "Resource": "${CANCEL_ORDER_LAMBDA_ARN}",
+      "Next": "NotifyFail"
     },
 
     "Shipping": {
@@ -46,6 +92,12 @@
     },
 
     "NotifyFail": {
+      "Type": "Task",
+      "Resource": "${NOTIFY_LAMBDA_ARN}",
+      "End": true
+    },
+
+    "NotifyOutOfStock": {
       "Type": "Task",
       "Resource": "${NOTIFY_LAMBDA_ARN}",
       "End": true

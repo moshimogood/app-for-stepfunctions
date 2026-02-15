@@ -12,7 +12,10 @@ sed \
   -e "s|\${PAYMENT_LAMBDA_ARN}|arn:aws:lambda:$REGION:$ACCOUNT_ID:function:PaymentLambda|g" \
   -e "s|\${SHIPPING_LAMBDA_ARN}|arn:aws:lambda:$REGION:$ACCOUNT_ID:function:ShippingLambda|g" \
   -e "s|\${NOTIFY_LAMBDA_ARN}|arn:aws:lambda:$REGION:$ACCOUNT_ID:function:NotifyLambda|g" \
-  infra/stepfunctions/order-workflow.asl.json \
+  -e "s|\${CANCEL_ORDER_LAMBDA_ARN}|arn:aws:lambda:$REGION:$ACCOUNT_ID:function:CancelOrderLambda|g" \
+  -e "s|\${FRAUD_CHECK_LAMBDA_ARN}|arn:aws:lambda:$REGION:$ACCOUNT_ID:function:FraudCheckLambda|g" \
+  -e "s|\${POINT_CALCULATE_LAMBDA_ARN}|arn:aws:lambda:$REGION:$ACCOUNT_ID:function:PointCalculateLambda|g" \
+    infra/stepfunctions/order-workflow.asl.json \
   > "$TMP_FILE"
 
 STATE_MACHINE_NAME="OrderWorkflow"
