@@ -16,6 +16,8 @@ HANDRERS=(
     CancelOrderLambda
     FraudCheckLambda
     PointCalculateLambda
+    ItemInventoryLambda
+    InventoryAggregateLambda
 )
 
 
@@ -47,6 +49,12 @@ for FUNC in "${HANDRERS[@]}"; do
             ;;
         PointCalculateLambda)
             HANDLER="com.example.order.handler.PointCalculateHandler::handleRequest"
+            ;;
+        ItemInventoryLambda)
+            HANDLER="com.example.order.handler.ItemInventoryHandler::handleRequest"
+            ;;
+        InventoryAggregateLambda)
+            HANDLER="com.example.order.handler.InventoryAggregateHandler::handleRequest"
             ;;
         *)
             echo "Unknown function: $FUNC"

@@ -5,12 +5,29 @@
     "OrderReceive": {
       "Type": "Task",
       "Resource": "${ORDER_RECEIVE_LAMBDA_ARN}",
-      "Next": "InventoryCheck"
+      "Next": "processItems"
     },
 
-    "InventoryCheck": {
+    "processItems": {
+      "Type": "Map",
+      "ItemsPath": "$.items",
+      "ResultPath": "$.inventoryResults",
+      "Iterator": {
+        "StartAt": "ItemInventoryCheck",
+        "States": {
+          "ItemInventoryCheck": {
+            "Type": "Task",
+            "Resource": "${ITEM_INVENTORY_LAMBDA_ARN}",
+            "End": true
+          }
+        }
+      },
+      "Next": "AggregateInventoryResults"
+    },
+
+    "AggregateInventoryResults": {
       "Type": "Task",
-      "Resource": "${INVENTORY_LAMBDA_ARN}",
+      "Resource": "${INVENTORY_AGGREGATE_LAMBDA_ARN}",
       "Next": "InventoryChoice"
     },
 
@@ -18,7 +35,7 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.status",
+          "Variable": "$.allInStock",
           "StringEquals": "OUT_OF_STOCK",
           "Next": "NotifyOutOfStock"
         }
